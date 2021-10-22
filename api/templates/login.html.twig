@@ -1,0 +1,16 @@
+{% extends "base.html.twig" %}
+
+{% block container %}
+    <div class="card my-3 rounded shadow-sm">
+
+        <div class="card-header">Login with Social Media</div>
+        <div class="card-body">
+            <div class="d-grid gap-2">
+                <a href="{{ path('connect_google') }}" class="btn btn-success">
+                    <i class="fa fa-facebook fa-fw"></i>Login with Google
+                </a>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

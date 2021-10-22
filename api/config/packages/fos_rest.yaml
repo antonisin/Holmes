@@ -1,0 +1,32 @@
+handcraftedinthealps_rest_routing:
+    routing_loader:
+        default_format: 'json'
+        prefix_methods: true
+        include_format: true
+
+fos_rest:
+    param_fetcher_listener: true
+    body_converter:
+        enabled: true
+        validate: true
+        validation_errors_argument: validationErrors
+    view:
+        view_response_listener: 'force'
+        formats:
+            json : true
+
+    body_listener:
+        array_normalizer:
+            service: fos_rest.normalizer.camel_keys
+            forms: true
+
+    routing_loader: false
+
+    format_listener:
+        rules:
+            - { path: '^/api/v1/doc', priorities: [ 'html', '*/*'], fallback_format: ~, prefer_extension: true }
+            - { path: '^/api/v1', priorities: ['json'], fallback_format: json,  prefer_extension: true }
+            - { path: '^/_profiler', priorities: [ 'html', '*/*'], fallback_format: ~, prefer_extension: true }
+            - { path: '^/', priorities: [ 'html', '*/*'], fallback_format: ~, prefer_extension: true }
+#            - { path: '^/', stop: true }
+

@@ -1,0 +1,25 @@
+parameters:
+    SOURCE_PROCESS_LIMIT: '%env(SOURCE_PROCESS_LIMIT)%'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+            - '../src/Tests/'
+
+    App\EventListener\CorsListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest,  priority: 300}
+            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+
+    security.logout_listener:
+        arguments: ['@security.token_storage', '@security.http_utils', '@event_dispatcher', []]
+        class: App\EventListener\LogoutListener
+        abstract: true

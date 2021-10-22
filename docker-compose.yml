@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+    nginx:
+        build:
+            context: config/nginx
+            args:
+                API_DOMAIN: "${API_DOMAIN}"
+
+        container_name: 'isis_nginx'
+        volumes:
+            - ./api:/var/www/api
+        ports:
+            - "443:443"
+        links: [ php ]
+        networks:
+            default:
+                aliases:
+                    - isis.local
+
+    mysql:
+        image: mysql:latest
+        command: --default-authentication-plugin=mysql_native_password
+        container_name: 'isis_mysql'
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_USER: "${MYSQL_USER}"
+            MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+            MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+        volumes:
+            - ./mysql:/var/lib/mysql
+        networks: [default]
+
+    php:
+        build:
+            context: config/php
+            args:
+                XDEBUG: "${XDEBUG}"
+        container_name: 'isis_php'
+        networks: [ default ]
+        volumes:
+            - ./api:/var/www/api
+        links:
+            - mysql
+        depends_on:
+            - mysql
+
+
+networks:
+    default:
+        external: true
+        name: isis_network

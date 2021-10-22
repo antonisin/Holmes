@@ -1,0 +1,8 @@
+**vendor/**
+.idea
+.idea**
+**.idea**
+**DS_STORE
+composer.lock
+mysql**
+symfony.lock

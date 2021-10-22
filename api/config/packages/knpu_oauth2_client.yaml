@@ -1,0 +1,25 @@
+knpu_oauth2_client:
+    clients:
+        google:
+            type: google
+#            client_id: '390390207082-71mvu4830ng5p96opkvmalrlgke9qv26.apps.googleusercontent.com'
+#            client_secret: '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'
+
+            client_id: '390390207082-pk71uo7isn4hdohn4flprdos17f0c9gj.apps.googleusercontent.com'
+            client_secret: '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'
+            redirect_route: connect_google_check
+            redirect_params: {}
+#            graph_api_version: v2.12
+
+
+
+#hwi_oauth:
+#    firewall_names: [ main ]
+#    resource_owners:
+#        any_name:
+#            type: google
+#            scope: "email profile"
+#            client_id: "390390207082-71mvu4830ng5p96opkvmalrlgke9qv26.apps.googleusercontent.com"
+#            client_secret: "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"
+#            options:
+#                csrf: true

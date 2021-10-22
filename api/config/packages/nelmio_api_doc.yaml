@@ -1,0 +1,16 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Isis API Documentation
+            description: This is Andromeda API Documentation
+            version: 1.0.0
+
+#    areas:
+#        default:
+#            path_patterns: [ ^/api/v1/(?!doc|tus) ]
+
+#    models:
+#        names:
+#            - {alias: PhoneNumber,  type: App\Entity\PhoneNumber}
+#            - {alias: User,  type: App\Entity\User}
+#
