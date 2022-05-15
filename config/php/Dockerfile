@@ -10,7 +10,6 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN apk update && apk add icu-dev gnu-libiconv oniguruma-dev gettext-dev libxml2-dev libmcrypt libmcrypt-dev
 
 RUN ls /usr/local/etc/php
-#RUN cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
 #RUN sed -i -E 's#;opcache.max_accelerated_files.*#opcache.max_accelerated_files=20000#' /usr/local/etc/php/php.ini
 #RUN sed -i -E 's#;realpath_cache_size.*#realpath_cache_size=4096K#' /usr/local/etc/php/php.ini
 #RUN sed -i -E 's#;realpath_cache_ttl.*#realpath_cache_ttl=600#' /usr/local/etc/php/php.ini
@@ -24,6 +23,7 @@ EXPOSE 9000
 
 FROM php AS php_worker
 
+RUN cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
 RUN sed -i -E 's#memory_limit.*#memory_limit=900M#' /usr/local/etc/php/php.ini
 RUN sed -i -E 's#post_max_size.*#post_max_size=10000M#' /usr/local/etc/php/php.ini
 RUN sed -i -E 's#upload_max_filesize.*#upload_max_filesize=10000M#' /usr/local/etc/php/php.ini
