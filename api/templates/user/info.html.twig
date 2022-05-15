@@ -1,0 +1,34 @@
+<div class="card my-3 rounded shadow-sm">
+    <div class="card-header">User</div>
+    <div class="card-body">
+        <table class="table">
+            <tbody>
+            <tr>
+                <td>Email</td>
+                <td>{{ user.email }}</td>
+            </tr>
+            <tr>
+                <td>First Name:</td>
+                <td>{{ user.firstName }}</td>
+            </tr>
+            <tr>
+                <td>Last Name:</td>
+                <td> {{ user.lastName }}</td>
+            </tr>
+            <tr>
+                <td>Created At:</td>
+                <td>{{ user.createdAt|date("d/m/Y H:i") }}  <small class="text-secondary fw-light">*(in our system)</small></td>
+            </tr>
+            <tr>
+                <td>RefId:</td>
+                <td>{{ user.refId }}</td>
+            </tr>
+            <tr>
+                <td>Picture:</td>
+                <td><img src="{{ user.picture }}" referrerpolicy="no-referrer" alt="Avatar" class="avatar" onerror="this.onerror=null;this.src='https://placeimg.com/200/300/animals';"/></td>
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>

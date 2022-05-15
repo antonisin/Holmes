@@ -1,0 +1,14 @@
+{% extends "base.html.twig" %}
+
+{% block container %}
+    <div class="row">
+        <div class="col-md-12">
+            {% include '/admin/users.html.twig' %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            {% include '/admin/sources.html.twig' %}
+        </div>
+    </div>
+{% endblock %}

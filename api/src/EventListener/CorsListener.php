@@ -2,6 +2,7 @@
 
 namespace App\EventListener;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -11,10 +12,23 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * @author Maxim Antonisin <maxim.antonisin@gmail.com>
  *
- * @version 1.0.0
+ * @version 1.1.0
  */
 class CorsListener
 {
+    const ALLOWED_HEADERS = [
+        'Origin',
+        'Content-Type',
+        'Accept',
+        'Authorization',
+        'X-AUTH-TOKEN',
+        'upload-length',
+        'upload-metadata',
+        'upload-offset',
+        'upload-concat',
+    ];
+
+
     /**
      * Validate and resolve CORS on request received.
      *
@@ -29,13 +43,7 @@ class CorsListener
         $request = $event->getRequest();
         if ('OPTIONS' === $request->getMethod()) {
             $response = new Response();
-
-            $response->headers->set('Access-Control-Allow-Credentials', 'true');
-            $response->headers->set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, PATCH, OPTIONS');
-            $response->headers->set('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept, Authorization, X-AUTH-TOKEN, tus-resumable, upload-length, upload-metadata, upload-offset, upload-concat');
-            $response->headers->set('Access-Control-Max-Age', 3600);
-            $response->headers->set('Access-Control-Allow-Origin', $request->headers->get('origin') ?? '*');
-
+            $this->updateResponse($request, $response);
             $event->setResponse($response);
         }
     }
@@ -47,16 +55,27 @@ class CorsListener
      */
     public function onKernelResponse($event): void
     {
-        $request = $event->getRequest();
-
         $response = $event->getResponse();
+        $this->updateResponse($event->getRequest(), $response);
 
-        $response->headers->set('Access-Control-Allow-Credentials', 'true');
-        $response->headers->set('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept, Authorization, X-AUTH-TOKEN, tus-resumable, upload-length, upload-metadata, upload-offset, upload-concat');
-        $response->headers->set('Access-Control-Allow-Origin', $request->headers->get('origin') ?? '*');
-        $response->headers->set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, PATCH, OPTIONS');
-        $response->headers->set('Vary', 'Origin');
 
         $event->setResponse($response);
+    }
+
+    /**
+     * Update response for cors reasons.
+     *
+     * @param Request|mixed  $request  - Client request instance.
+     * @param Response|mixed $response - Response instance.
+     * @return void
+     */
+    private function updateResponse(mixed $request, mixed $response)
+    {
+        $response->headers->set('Vary', 'Origin');
+        $response->headers->set('Access-Control-Allow-Credentials', 'true');
+        $response->headers->set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, PATCH, OPTIONS');
+        $response->headers->set('Access-Control-Allow-Headers', implode(',', self:: ALLOWED_HEADERS));
+        $response->headers->set('Access-Control-Max-Age', 3600);
+        $response->headers->set('Access-Control-Allow-Origin', $request->headers->get('origin') ?? '*');
     }
 }

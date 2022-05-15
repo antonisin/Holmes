@@ -1,0 +1,33 @@
+{% extends "base.html.twig" %}
+
+{% block container %}
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card my-3 rounded shadow-sm">
+                <div class="card-header">Add to Watch</div>
+                <div class="card-body">
+                    <form action="{{ path('app_usernumber_post') }}" method="POST">
+                        <div class="row align-items-center">
+                            <div class="col-auto input-group flex-nowrap">
+                                <label for="number" class="col-form-label d-none">Watch Number</label>
+                                <input type="text" id="number" name="number" class="form-control" aria-describedby="number">
+                            </div>
+                            <div class="col-auto">
+                        <span id="number" class="form-text">
+                            The number format must be (NUMBER/YEAR) example 1234583/2019
+                        </span>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 mt-2">
+                            <button class="btn btn-warning">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            {% include '/dashboard/collection.html.twig' %}
+        </div>
+    </div>
+
+{% endblock %}

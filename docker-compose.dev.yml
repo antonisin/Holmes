@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+    nginx:
+        volumes:
+            - ./api:/var/www/api
+
+    mail:
+        image: maildev/maildev
+        container_name: "holmes_mail"
+        ports:
+            - "1080:1080"
+            - "1025:1025"
+        networks: [ default ]
+
+    mysql:
+        ports:
+            - "3306:3306"
+        volumes:
+            - ./mysql:/var/lib/mysql
+
+    php: &php_container
+        links:
+            - mysql
+            - mail
+        build:
+            context: ./
+            dockerfile: config/php/Dockerfile
+            target: php_dev
+        volumes:
+            - ./api:/var/www/api
+
+    php_worker:
+        <<: *php_container

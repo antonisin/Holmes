@@ -1,0 +1,12 @@
+{% extends "base.html.twig" %}
+
+{% block container %}
+    <div class="row">
+        <div class="col-md-6">
+            {% include '/user/info.html.twig' %}
+        </div>
+        <div class="col-md-6">
+            {% include '/user/notification.html.twig' %}
+        </div>
+    </div>
+{% endblock %}

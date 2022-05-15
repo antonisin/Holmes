@@ -1,0 +1,31 @@
+<div id="sources" class="card my-3 rounded shadow-sm">
+    <div class="card-header">Source List</div>
+    <div class="card-body">
+        <table class="datatable table">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Link</th>
+                <th class="text-center">Created on</th>
+                <th class="text-center">Updated on</th>
+                <th class="text-center">Processed on</th>
+            </tr>
+            </thead>
+            <tbody>
+
+                {% for model in sources %}
+                    <tr class="align-middle">
+                        <td>{{ loop.index }}</td>
+                        <td>{{ model.fileNameReal }}</td>
+                        <td class="text-center"><a href="{{ model.fileUrl }}">PDF</a></td>
+                        <td class="text-center">{{ model.createdAt|date("d/m/Y H:i") }}</td>
+                        <td class="text-center">{{ model.updatedAt|date("d/m/Y H:i") }}</td>
+                        <td class="text-center">{{ model.processedAt|date("d/m/Y H:i") }}</td>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</div>

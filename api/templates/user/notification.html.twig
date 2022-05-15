@@ -1,0 +1,81 @@
+<div class="card my-3 rounded shadow-sm">
+    {% set PHONE_TYPE = constant('App\\Entity\\Verification::PHONE_TYPE') %}
+    {% set EMAIL_TYPE = constant('\\App\\Entity\\Verification::EMAIL_TYPE') %}
+
+    <div class="card-header">Notification Settings</div>
+    <div class="card-body">
+        {% set notification = user.notification %}
+
+        {% if not notification.email and not notification.phone %}
+            <div class="alert alert-danger" role="alert">
+                Please add your email of phone number. In over case you will not receive any notifications.
+            </div>
+        {% endif %}
+
+        <form action="{{ path('app_user_notification_post') }}" method="POST">
+            <label for="phone" class="form-label">
+                Phone Number
+                {% if notification.phoneVerified %} <span class="badge bg-success">Verified</span>
+                {% elseif notification.phone %}<span class="badge bg-danger">Unverified</span>
+                {% endif %}
+            </label>
+            <div class="input-group">
+                <input type="text" id="phone" name="phone" class="form-control" placeholder="Phone Number" value="{{ notification.phone }}">
+                {% if not notification.phoneVerified and notification.phone and notification.verification is null %}
+                    <div class="input-group-append">
+                        <a class="btn btn-warning float-start" href="{{ path('app_user_notification_verify_phone') }}">Verify</a>
+                    </div>
+                {% endif %}
+            </div>
+
+
+            {% if notification.verification is defined and notification.verification is not null and notification.verification.type == PHONE_TYPE %}
+                <div class="alert alert-warning">
+                    <p>You received verification code on your phone via sms.</p>
+                    <div class="input-group">
+                        <label for="verificationCode" class="d-none">Verification Code</label>
+                        <input id="verificationCode" name="verificationCode" type="text" class="form-control" placeholder="Verification Code">
+                        <div class="input-group-append">
+                            <button class="btn btn-warning float-start">Verify</button>
+                            <a class="btn btn-outline-secondary float-start" href="{{ path('app_user_notification_verify_phone') }}">Re-send</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <label for="email" class="form-label">
+                Email
+                {% if notification.emailVerified %} <span class="badge bg-success">Verified</span>
+                {% elseif notification.email %}<span class="badge bg-danger">Unverified</span>
+                {% endif %}
+            </label>
+            <div class="input-group">
+                <input type="text" id="email" name="email" class="form-control" placeholder="Email" value="{{ notification.email }}">
+                {% if not notification.emailVerified and notification.email and notification.verification is null  %}
+                    <div class="input-group-append">
+                        <a class="btn btn-warning float-start" href="{{ path('app_user_notification_verify_email') }}">Verify</a>
+                    </div>
+                {% endif %}
+            </div>
+
+
+            {% if notification.verification is defined and notification.verification is not null and notification.verification.type == EMAIL_TYPE%}
+                <div class="alert alert-warning">
+                    <p>You received verification code on your email.</p>
+                    <div class="input-group">
+                        <label for="verificationCode" class="d-none">Verification Code</label>
+                        <input id="verificationCode" name="verificationCode" type="text" class="form-control" placeholder="Verification Code">
+                        <div class="input-group-append">
+                            <button class="btn btn-warning float-start">Verify</button>
+                            <a class="btn btn-outline-secondary float-start" href="{{ path('app_user_notification_verify_email') }}">Re-send</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="d-grid gap-2 mt-2">
+                <button class="btn btn-warning">Save</button>
+            </div>
+        </form>
+    </div>
+</div>

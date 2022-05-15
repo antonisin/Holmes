@@ -1,5 +1,5 @@
 parameters:
-    SOURCE_PROCESS_LIMIT: '%env(SOURCE_PROCESS_LIMIT)%'
+    VERIFICATION_LIMIT:  '%env(VERIFICATION_LIMIT)%'
 
 services:
     _defaults:
@@ -19,7 +19,11 @@ services:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest,  priority: 300}
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
 
-    security.logout_listener:
-        arguments: ['@security.token_storage', '@security.http_utils', '@event_dispatcher', []]
-        class: App\EventListener\LogoutListener
-        abstract: true
+    App\EventListener\RequestListener:
+        arguments: ['@router', '@request_stack']
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
+#    security.logout_listener:
+#        arguments: ['@security.token_storage', '@security.http_utils', '@event_dispatcher', []]
+#        class: App\EventListener\LogoutListener
+#        abstract: true

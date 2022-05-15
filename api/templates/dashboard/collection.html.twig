@@ -1,0 +1,37 @@
+<div class="card my-3 rounded shadow-sm">
+    <div class="card-header">Watch List</div>
+    <div class="card-body">
+        <table class="table mt-4">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Watch Number</th>
+                <th class="text-center">Added on</th>
+                <th class="text-center">Updated on</th>
+                <th class="text-center">State</th>
+            </tr>
+            </thead>
+            <tbody>
+
+                {% for model in collection %}
+                    <tr class="{% if model.infoNumber is defined and model.infoNumber is not null %}table-success{% endif %}">
+                        <td>{{ loop.index }}</td>
+                        <td>{{ model.formatted }}</td>
+                        <td class="text-center">{{ model.createdAt|date("d/m/Y H:i") }}</td>
+                        <td class="text-center">{{ model.updatedAt|date("d/m/Y H:i") }}</td>
+                        <td class="text-center">
+                            {% if model.infoNumber is defined and model.infoNumber is not null %}
+                                <a href="{{ model.infoNumber.source.fileUrl }}" target="_blank">PDF File</a>
+                            {% else %}
+                                <a href="{{ path('app_usernumber_toggle', {id: model.id}) }}" class="btn btn-{% if model.enabled %}success{% else %}danger{% endif %}">
+                                    {% if model.enabled %}Enabled{% else %}Disabled{% endif %}
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</div>

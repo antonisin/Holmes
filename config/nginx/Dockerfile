@@ -14,10 +14,9 @@ COPY nginx.conf /etc/nginx
 COPY api.conf /etc/nginx/sites-enabled
 RUN sed -i -e "s/API_DOMAIN/$API_DOMAIN/" /etc/nginx/sites-enabled/api.conf
 
-COPY isis.crt /etc/nginx/ssl
-COPY isis.key /etc/nginx/ssl
+COPY holmes.crt /etc/nginx/ssl
+COPY holmes.key /etc/nginx/ssl
 
 RUN echo "upstream php-upstream { server php:9000; }" >> /etc/nginx/conf.d/upstream.conf
 
 EXPOSE 80 443
-

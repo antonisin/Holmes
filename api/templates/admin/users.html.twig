@@ -1,0 +1,33 @@
+<div class="card my-3 rounded shadow-sm">
+    <div class="card-header">Users List</div>
+    <div class="card-body">
+        <table class="table datatable">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Full Name</th>
+                <th>Photo</th>
+                <th>Email</th>
+                <th>Ref Id</th>
+                <th>Roles</th>
+                <th class="text-center">Created on</th>
+                <th class="text-center">Updated on</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for model in users %}
+                <tr class="align-middle">
+                    <td>{{ loop.index }}</td>
+                    <td>{{ model.firstName }} {{ model.lastName }}</td>
+                    <td class="text-center"><img src="{{ model.picture }}" alt="Avatar" class="avatar avatar-sm" onerror="this.onerror=null;this.src='https://placeimg.com/200/300/animals';"/></td>
+                    <td>{{ model.email }}</td>
+                    <td>{{ model.refId }}</td>
+                    <td>{{ model.roles|join(', ') }}</td>
+                    <td class="text-center">{{ model.createdAt|date("d/m/Y H:i") }}</td>
+                    <td class="text-center">{{ model.updatedAt|date("d/m/Y H:i") }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
