@@ -51,6 +51,8 @@ FROM php as php_prod
 
 RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 COPY ./api /var/www/api
+RUN mkdir -p /var/www/api/var/log
+RUN mkdir -p /var/www/api/var/cache
 RUN chmod -R 777 /var/www/api/var/log
 RUN chmod -R 777 /var/www/api/var/cache
 
