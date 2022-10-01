@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * @author Maxim Antonisin <maxim.antonisin@gmail.com>
  *
- * @version 1.0.0
+ * @version 1.1.0
  */
 #[
     ORM\Entity,
@@ -69,6 +69,15 @@ class UserNumber extends BaseEntity
      */
     #[ORM\Column(type: 'datetime', nullable: true)]
     protected null|\DateTime $searchAt;
+
+    /**
+     * User number label.
+     * This property contain user number label. Label is used for readable view.
+     *
+     * @var string|null
+     */
+    #[ORM\Column(type: 'string', nullable: true)]
+    private string|null $label;
 
 
     /**
@@ -175,6 +184,32 @@ class UserNumber extends BaseEntity
     public function setInfoNumber(InfoNumber $infoNumber): UserNumber
     {
         $this->infoNumber = $infoNumber;
+
+        return $this;
+    }
+
+    /**
+     * Return user number label.
+     * This method is used to return user number label. Label is used for readable view.
+     *
+     * @return string|null
+     */
+    public function getLabel(): ?string
+    {
+        return $this->label;
+    }
+
+    /**
+     * Return user number label.
+     * This method is used to update user number label. Label is used for readable view.
+     *
+     * @param string|null $label - User number label value.
+     *
+     * @return $this
+     */
+    public function setLabel(?string $label): self
+    {
+        $this->label = $label;
 
         return $this;
     }

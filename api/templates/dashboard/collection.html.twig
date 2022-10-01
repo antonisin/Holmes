@@ -6,8 +6,9 @@
             <tr>
                 <th>#</th>
                 <th>Watch Number</th>
+                <th>Label</th>
                 <th class="text-center">Added on</th>
-                <th class="text-center">Updated on</th>
+                <th class="text-center">Last search on</th>
                 <th class="text-center">State</th>
             </tr>
             </thead>
@@ -17,16 +18,23 @@
                     <tr class="{% if model.infoNumber is defined and model.infoNumber is not null %}table-success{% endif %}">
                         <td>{{ loop.index }}</td>
                         <td>{{ model.formatted }}</td>
+                        <td>{{ model.label }}</td>
                         <td class="text-center">{{ model.createdAt|date("d/m/Y H:i") }}</td>
-                        <td class="text-center">{{ model.updatedAt|date("d/m/Y H:i") }}</td>
+                        <td class="text-center">{{ model.searchAt|date("d/m/Y H:i") }}</td>
                         <td class="text-center">
                             {% if model.infoNumber is defined and model.infoNumber is not null %}
                                 <a href="{{ model.infoNumber.source.fileUrl }}" target="_blank">PDF File</a>
                             {% else %}
-                                <a href="{{ path('app_usernumber_toggle', {id: model.id}) }}" class="btn btn-{% if model.enabled %}success{% else %}danger{% endif %}">
+                                <a href="{{ path('numbers_toggle', {id: model.id}) }}" class="btn btn-sm btn-outline-{% if model.enabled %}success{% else %}danger{% endif %}">
                                     {% if model.enabled %}Enabled{% else %}Disabled{% endif %}
                                 </a>
                             {% endif %}
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    data-bs-toggle="popover"
+                                    title="Delete?"
+                                    data-bs-content='Are you sure? <a href="{{ path('numbers_delete', {id: model.id}) }}" class="btn btn-sm btn-danger">Yes</a>'
+                            >Delete</button>
                         </td>
                     </tr>
                 {% endfor %}

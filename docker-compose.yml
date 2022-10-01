@@ -2,19 +2,13 @@ version: '3.8'
 
 services:
     nginx:
-        env_file:
-            - .env
-            - .env.local
         build:
             context: config/nginx
-            args:
-                API_DOMAIN: "${API_DOMAIN:-localhost}"
         container_name: 'holmes_nginx'
         volumes:
             - api-volume:/var/www/api
-        ports:
-            - "443:443"
-            - "80:80"
+            - ./logs/nginx:/var/log/nginx
+        expose: [ 80, 443 ]
         links: [ php ]
         networks: [ default ]
 
@@ -27,6 +21,7 @@ services:
             MYSQL_PASSWORD: "user"
             MYSQL_ROOT_PASSWORD: "root"
         networks: [ default ]
+        expose: [ 3306 ]
         volumes:
             - mysql-volume:/var/lib/mysql
 
@@ -39,6 +34,7 @@ services:
         networks: [ default ]
         volumes:
             - api-volume:/var/www/api
+            - ./logs/app:/var/www/api/var/log
         links:
             - mysql
         depends_on:

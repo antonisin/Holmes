@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+    nginx:
+        restart: always
+        ports:
+            - "443:443"
+            - "80:80"
+    php:
+        restart: always
+
+    php_worker:
+        restart: always
+
+    mysql:
+        restart: always

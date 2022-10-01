@@ -1,33 +1,56 @@
-<div class="card my-3 rounded shadow-sm">
-    <div class="card-header">Users List</div>
-    <div class="card-body">
-        <table class="table datatable">
-            <thead>
-            <tr>
-                <th>#</th>
-                <th>Full Name</th>
-                <th>Photo</th>
-                <th>Email</th>
-                <th>Ref Id</th>
-                <th>Roles</th>
-                <th class="text-center">Created on</th>
-                <th class="text-center">Updated on</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for model in users %}
-                <tr class="align-middle">
-                    <td>{{ loop.index }}</td>
-                    <td>{{ model.firstName }} {{ model.lastName }}</td>
-                    <td class="text-center"><img src="{{ model.picture }}" alt="Avatar" class="avatar avatar-sm" onerror="this.onerror=null;this.src='https://placeimg.com/200/300/animals';"/></td>
-                    <td>{{ model.email }}</td>
-                    <td>{{ model.refId }}</td>
-                    <td>{{ model.roles|join(', ') }}</td>
-                    <td class="text-center">{{ model.createdAt|date("d/m/Y H:i") }}</td>
-                    <td class="text-center">{{ model.updatedAt|date("d/m/Y H:i") }}</td>
+{% extends "base.html.twig" %}
+
+{% block container %}
+    <div id="sources" class="card mt-3 rounded shadow-sm">
+        <div class="card-header">Users List ({{ pagination.getTotalItemCount }})</div>
+        <div class="card-body">
+            {{ knp_pagination_filter(pagination, {
+                'user.id': 'ID',
+                'user.firstName': 'First name',
+                'user.lastName': 'Last name',
+                'user.refId': 'RefID',
+                'user.createdAt': 'Creeated on',
+                'user.updatedAt': 'Updated on',
+            }) }}
+            <table class="table">
+                <tr>
+                    <th class="text-center">{{ knp_pagination_sortable(pagination, 'Id', 'user.id') }}</th>
+                    <th class="text-center {{ pagination.isSorted(['user.firstName', 'user.lastName']) ? 'sorted' }}">
+                        {{ knp_pagination_sortable(pagination, 'Full Name', ['user.firstName', 'user.lastName']) }}
+                    </th>
+                    <th class="text-center">Photo</th>
+                    <th class="text-center {{ pagination.isSorted('user.email') ? 'sorted' }}">
+                        {{ knp_pagination_sortable(pagination, 'Email', 'user.email') }}
+                    </th>
+                    <th class="text-center {{ pagination.isSorted('user.refId') ? 'sorted' }}">
+                        {{ knp_pagination_sortable(pagination, 'Ref ID', 'user.refId') }}
+                    </th>
+                    <th class="text-center {{ pagination.isSorted('user.roles') ? 'sorted' }}">
+                        {{ knp_pagination_sortable(pagination, 'Roles', 'user.roles') }}
+                    </th>
+                    <th class="text-center {{ pagination.isSorted('user.createdAt') ? 'sorted' }}">
+                        {{ knp_pagination_sortable(pagination, 'Created on', 'user.createdAt') }}
+                    </th>
+                    <th class="text-center {{ pagination.isSorted('user.updatedAt') ? 'sorted' }}">
+                        {{ knp_pagination_sortable(pagination, 'Updated on', 'user.updatedAt') }}
+                    </th>
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+
+                {% for model in pagination %}
+                    <tr {% if loop.index is odd %}class="color"{% endif %}>
+                        <td>{{ model.id }}</td>
+                        <td>{{ model.firstName }} {{ model.lastName }}</td>
+                        <td class="text-center"><!--suppress HtmlDeprecatedAttribute -->
+                            <img src="{{ model.picture }}" alt="Avatar" class="avatar avatar-sm" onerror="this.onerror=null;this.src='https://placeimg.com/200/300/animals';"/></td>
+                        <td>{{ model.email }}</td>
+                        <td>{{ model.refId }}</td>
+                        <td>{{ model.roles|join(', ') }}</td>
+                        <td class="text-center">{{ model.createdAt|date("d/m/Y H:i") }}</td>
+                        <td class="text-center">{{ model.updatedAt|date("d/m/Y H:i") }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+            <div class="navigation"> {{ knp_pagination_render(pagination) }} </div>
+        </div>
     </div>
-</div>
+{% endblock %}

@@ -1,31 +1,52 @@
-<div id="sources" class="card my-3 rounded shadow-sm">
-    <div class="card-header">Source List</div>
-    <div class="card-body">
-        <table class="datatable table">
-            <thead>
-            <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Link</th>
-                <th class="text-center">Created on</th>
-                <th class="text-center">Updated on</th>
-                <th class="text-center">Processed on</th>
-            </tr>
-            </thead>
-            <tbody>
+{% extends "base.html.twig" %}
 
-                {% for model in sources %}
-                    <tr class="align-middle">
-                        <td>{{ loop.index }}</td>
-                        <td>{{ model.fileNameReal }}</td>
-                        <td class="text-center"><a href="{{ model.fileUrl }}">PDF</a></td>
+{% block container %}
+    <div id="sources" class="card mt-3 rounded shadow-sm">
+        <div class="card-header">Source List ({{ pagination.getTotalItemCount }})</div>
+        <div class="card-body">
+            {{ knp_pagination_filter(pagination, {
+                'source.id': 'ID',
+                'source.fileNameReal': 'File name',
+                'source.state': 'File state',
+                'source.createdAt': 'Creeated on',
+                'source.updatedAt': 'Updated on',
+                'source.processedAt': 'Processed on',
+            }) }}
+            <table class="table">
+                <tr>
+                    <th class="text-center">{{ knp_pagination_sortable(pagination, 'Id', 'source.id') }}</th>
+                    <th class="text-center">Link</th>
+                    <th class="text-center {{ pagination.isSorted('source.fileNameReal') ? 'sorted' }}">
+                        {{ knp_pagination_sortable(pagination, 'File Name', 'source.fileNameReal') }}
+                    </th>
+                    <th class="text-center {{ pagination.isSorted('source.state') ? 'sorted' }}">
+                        {{ knp_pagination_sortable(pagination, 'State', 'source.state') }}
+                    </th>
+                    <th class="text-center {{ pagination.isSorted('source.createdAt') ? 'sorted' }}">
+                        {{ knp_pagination_sortable(pagination, 'Created on', 'source.createdAt') }}
+                    </th>
+                    <th class="text-center {{ pagination.isSorted('source.updatedAt') ? 'sorted' }}">
+                        {{ knp_pagination_sortable(pagination, 'Updated on', 'source.updatedAt') }}
+                    </th>
+                    <th class="text-center {{ pagination.isSorted('source.processedAt') ? 'sorted' }}">
+                        {{ knp_pagination_sortable(pagination, 'Processed on', 'source.processedAt') }}
+                    </th>
+                </tr>
+
+                {% for model in pagination %}
+                    <tr {% if loop.index is odd %}class="color"{% endif %}>
+                        <td>{{ model.id }}</td>
+                        <td class="text-center"><a href="{{ model.fileUrl }}" target="_blank">PDF</a></td>
+                        <td>{{ model.fileNameReal|u.truncate(30) }}</td>
+                        <td>{{ model.state }}</td>
                         <td class="text-center">{{ model.createdAt|date("d/m/Y H:i") }}</td>
                         <td class="text-center">{{ model.updatedAt|date("d/m/Y H:i") }}</td>
-                        <td class="text-center">{{ model.processedAt|date("d/m/Y H:i") }}</td>
+                        <td class="text-center">{{ model.processedAt ? model.processedAt|date("d/m/Y H:i") : '-' }} </td>
                     </tr>
                 {% endfor %}
-
-            </tbody>
-        </table>
+            </table>
+            <div class="navigation"> {{ knp_pagination_render(pagination) }} </div>
+        </div>
     </div>
-</div>
+{% endblock %}
+

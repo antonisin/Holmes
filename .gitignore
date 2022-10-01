@@ -11,3 +11,4 @@ config/nginx/*.key
 .env.local
 api/public/source/**
 api/public/vendor/**
+logs**

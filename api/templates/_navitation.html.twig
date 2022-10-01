@@ -1,0 +1,30 @@
+<header class="p-3 bg-dark text-white">
+    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+        <span class="fs-2 ms-3">Holmes</span>
+        <ul class="nav col-12 col-sm-9 offset-sm-1 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+            <li>
+                <a href="{{ path('dashboard') }}" class="nav-link px-2 text-{{ route == 'dashboard' ? 'warning' : 'secondary' }}">Dashboard</a>
+            </li>
+            <li>
+                <a href="{{ path('app_user_settings') }}" class="nav-link px-2 text-{{ route == 'app_user_settings' ? 'warning' : 'secondary'}}">Settings</a>
+            </li>
+            {% if is_granted(constant('App\\Entity\\User::ROLE_ADMIN')) %}
+                <li>
+                    <div class="dropdown">
+                        <span class="nav-link px-2 dropdown-toggle text-{{ route in ['admin_users', 'admin_sources', 'admin_numbers'] ? 'warning' : 'secondary'}}" id="adminMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                            Admin
+                        </span>
+                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="adminMenu">
+                            <li> <a href="{{ path('admin_sources') }}" class="dropdown-item {{ route == 'admin_sources' ? 'text-warning' }}">Sources</a></li>
+                            <li> <a href="{{ path('admin_users') }}" class="dropdown-item {{ route == 'admin_users' ? 'text-warning' }}">Users</a></li>
+                            <li> <a href="{{ path('admin_numbers') }}" class="dropdown-item {{ route == 'admin_numbers' ? 'text-warning' }}">Numbers</a></li>
+                        </ul>
+                    </div>
+                </li>
+            {% endif %}
+        </ul>
+        <div class="text-end">
+            <a type="button" class="btn btn-warning" href="/logout">Logout</a>
+        </div>
+    </div>
+</header>

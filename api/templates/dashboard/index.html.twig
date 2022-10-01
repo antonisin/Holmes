@@ -6,16 +6,20 @@
             <div class="card my-3 rounded shadow-sm">
                 <div class="card-header">Add to Watch</div>
                 <div class="card-body">
-                    <form action="{{ path('app_usernumber_post') }}" method="POST">
+                    <form action="{{ path('numbers_create') }}" method="POST">
                         <div class="row align-items-center">
-                            <div class="col-auto input-group flex-nowrap">
-                                <label for="number" class="col-form-label d-none">Watch Number</label>
+                            <div class="col-auto input-group flex-nowrap mb-2">
+                                <label for="number" class="col-form-label me-2">Watch Number</label>
                                 <input type="text" id="number" name="number" class="form-control" aria-describedby="number">
                             </div>
+                            <div class="col-auto input-group flex-nowrap">
+                                <label for="label" class="col-form-label me-2">Label</label>
+                                <input type="text" id="label" name="label" class="form-control" aria-describedby="label">
+                            </div>
                             <div class="col-auto">
-                        <span id="number" class="form-text">
-                            The number format must be (NUMBER/YEAR) example 1234583/2019
-                        </span>
+                                <span id="number" class="form-text">
+                                    The number format must be (NUMBER/YEAR) example 1234583/2019
+                                </span>
                             </div>
                         </div>
                         <div class="d-grid gap-2 mt-2">

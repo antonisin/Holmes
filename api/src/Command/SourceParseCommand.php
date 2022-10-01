@@ -21,11 +21,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
  *
  * @author Maxim Antonisin <maxim.antonisin@gmail.com>
  *
- * @version 1.0.0
+ * @version 1.1.0
  */
 class SourceParseCommand extends Command
 {
-    public const NUMBER_INFO_REGEXP = '/\((\d{3,}\/\d+)\)/';
+    public const NUMBER_INFO_REGEXP = '/\((\d{3,}\/([a-zA-Z]{1,5})?\/?\d+)\)/';
 
 
     /**
@@ -80,7 +80,13 @@ class SourceParseCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var Source $source */
-        $source = $this->manager->getRepository(Source::class)->findOneBy(['processedAt' => null]);
+        $source = $this->manager->getRepository(Source::class)->findOneBy([
+            'processedAt' => null,
+            'state'       => Source::STATE_OK,
+        ]);
+        if (null === $source) {
+            return Command::SUCCESS;
+        }
 
         /** @noinspection MissingService */
         $fileLocation = sprintf(
@@ -89,21 +95,40 @@ class SourceParseCommand extends Command
             $source->getFileNameReal()
         );
 
-        $parser = new Parser();
-        $pdf    = $parser->parseFile($fileLocation);
+        try {
+            $parser = new Parser();
+            $pdf    = $parser->parseFile($fileLocation);
+        } catch (\Exception $exception) {
+            $source->setState(Source::STATE_INVALID_PDF);
+            $this->manager->persist($source);
+            $this->manager->flush();
+
+            return Command::SUCCESS;
+        }
 
         $text = $pdf->getText();
-        $text = preg_replace('/[^\n0-9\/()]]*/', '', $text);
+        $text = preg_replace('/[^\n0-9\/()a-zA-Z]]*/', '', $text);
 
         preg_match_all(self::NUMBER_INFO_REGEXP, $text, $collection);
         foreach ($collection[1] as $item) {
             $temp = explode('/', $item);
+            if (count($temp) < 2) {
+                continue;
+            }
+
             $model = new InfoNumber();
             $model
-                ->setNumber($temp[0])
-                ->setYear($temp[1])
                 ->setSource($source)
+                ->setNumber($temp[0])
             ;
+            if (count($temp) === 2) {
+                $model->setYear($temp[1]);
+            } else {
+                $model
+                    ->setCode($temp[1])
+                    ->setYear($temp[2])
+                ;
+            }
             $this->manager->persist($model);
         }
         $source->setProcessedAt(new \DateTime());

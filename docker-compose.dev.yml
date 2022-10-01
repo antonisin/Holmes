@@ -4,6 +4,14 @@ services:
     nginx:
         volumes:
             - ./api:/var/www/api
+        labels:
+            - traefik.enable=true
+            - traefik.http.routers.holmes-app.rule=HostRegexp(`holmes.dev`,`{subdomain:.+}.holmes.dev`)
+            - traefik.http.routers.holmes-app-ssl.rule=HostRegexp(`holmes.dev`,`{subdomain:.+}.holmes.dev`)
+            - traefik.http.routers.holmes-app-ssl.entrypoints=webs,web
+            - traefik.http.routers.holmes-app-ssl.tls=true
+            - traefik.http.services.holmes-app-ssl.loadbalancer.server.port=443
+            - traefik.http.services.holmes-app-ssl.loadbalancer.server.scheme=https
 
     mail:
         image: maildev/maildev
@@ -32,3 +40,8 @@ services:
 
     php_worker:
         <<: *php_container
+
+networks:
+    default:
+        external: true
+        name: proxy

@@ -4,8 +4,8 @@ namespace App\Command;
 
 use App\Entity\Source;
 use Doctrine\ORM\EntityManagerInterface;
+use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
-use JetBrains\PhpStorm\Pure;
 use MaximAntonisin\Spirit\SpiritAsyncClient;
 use MaximAntonisin\Spirit\SpiritBaseClient;
 use Psr\Container\ContainerExceptionInterface;
@@ -15,7 +15,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\Link;
 use Symfony\Component\HttpFoundation\Request;
+use \GuzzleHttp\Exception\ConnectException;
 
 /**
  * Source download command.
@@ -25,14 +28,19 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Maxim Antonisin <maxim.antonisin@gmail.com>
  *
- * @version 1.0.0
+ * @version 1.1.0
  */
 class SourceDownloadCommand extends Command
 {
-    public const SOURCE_PATH = 'ordine-articolul-11/';
+    public const SOURCE_COLLECTION_PATH   = 'category/ordine/';
+    public const SOURCE_COLLECTION_PATH_1 = 'category/ordine/page/2/';
     public const SOURCE_PDF_REGEXP = '/(http[^"]*\.pdf)">([a-zA-Z0-9]+)</';
     public const BASE_URI = 'cetatenie.just.ro/';
-
+    public const CLIENT_HEADERS = [
+        'Host'          => 'cetatenie.just.ro',
+        'User-Agent'    => ' PostmanRuntime/7.29.0',
+        'Postman-Token' => ' 2e973768-333c-4d3a-ac4c-2f46f6def242',
+    ];
 
     /**
      * Container bag instance.
@@ -58,6 +66,17 @@ class SourceDownloadCommand extends Command
      * @var SpiritAsyncClient|SpiritBaseClient
      */
     private SpiritBaseClient|SpiritAsyncClient $client;
+
+    /**
+     * Current client request params.
+     *
+     * This property contain current client params used for each request (like headers, verify etc.).
+     * @var array
+     */
+    private array $requestParams = [
+        RequestOptions::HEADERS => self::CLIENT_HEADERS,
+        RequestOptions::VERIFY  => false,
+    ];
 
 
     /**
@@ -86,6 +105,12 @@ class SourceDownloadCommand extends Command
             ->setDescription('Command to download all pdf sources')
             ->setAliases(['a:s:d'])
             ->addOption(
+                'proxy',
+                'p',
+                InputOption::VALUE_OPTIONAL,
+                'Proxy used for download')
+
+            ->addOption(
                 'limit',
                 'l',
                 InputOption::VALUE_OPTIONAL,
@@ -106,12 +131,24 @@ class SourceDownloadCommand extends Command
         ini_set('upload_max_filesize', '10000M');
         ini_set('max_execution_time', '600');
 
-        $this->client->addRequest(Request::METHOD_GET, self::SOURCE_PATH, []);
+        if ($input->hasOption('proxy') && is_string($input->getOption('proxy'))) {
+            $this->requestParams[RequestOptions::PROXY] = $input->getOption('proxy');
+        } elseif ($this->containerBag->has('PROXY')) {
+            /** @noinspection MissingService */
+            $this->requestParams[RequestOptions::PROXY] = $this->containerBag->get('PROXY');
+        }
+
+        $collection = $this->getSourceLinks();
+
+        foreach ($collection as $link) {
+            $this->client->addRequest(Request::METHOD_GET, $link, $this->requestParams);
+        }
         $this->client->sendAll();
-        $content = $this->getOneContent();
+
+        $content = implode('', $this->client->getContents());
         preg_match_all(self::SOURCE_PDF_REGEXP, $content, $matches);
 
-        $limit = (int) ($input->getOption('limit') ?? 999999);
+        $limit = (int) ($input->getOption('limit') ?? 10);
         $counter = 0;
 
         foreach ($matches[1] as $index => $url) {
@@ -137,36 +174,39 @@ class SourceDownloadCommand extends Command
             $this->client->addRequest(Request::METHOD_GET, $model->getFileUrl(), [
                 RequestOptions::SINK => $destination,
             ]);
-            $this->client->sendAll();
 
             $this->manager->persist($model);
-            $this->manager->flush();
             $counter++;
             if ($counter >= $limit) {
                 break;
             }
         }
 
-        return Command::SUCCESS;
-    }
+        $output->writeln(sprintf('Downloaded %d files', $counter));
 
-    /**
-     * Get first content from responses.
-     * Async Spirit client is using several requests to get content and as result store their responses in collection.
-     * This method will return first successful response from collection of responses.
-     *
-     * @return false|array|mixed
-     */
-    #[Pure]
-    private function getOneContent(): mixed
-    {
-        foreach ($this->client->getContents() as $content) {
-            if ($content and !empty($content)) {
-                return $content;
+        $this->manager->flush();
+
+        $this->client->sendAll(true);
+        /** Check all responses for invalid file or request error. */
+        foreach ($this->client->getResponses() as $res) {
+            /** All simple response class instances are ok and can be skipped. */
+            if ($res instanceof Response) {
+                continue;
+            }
+            /** In case of connection error, source state will be updated. */
+            if ($res instanceof ConnectException) {
+                $uri = $res->getRequest()->getUri();
+                $model = $this->manager->getRepository(Source::class)->findOneBy([
+                    'fileUrl' => sprintf('%s://%s%s', $uri->getScheme(), $uri->getHost(), $uri->getPath()),
+                ]);
+
+                $model->setState(Source::STATE_BAD_SOURCE);
+                $this->manager->persist($model);
+                $this->manager->flush();
             }
         }
 
-        return false;
+        return Command::SUCCESS;
     }
 
     /**
@@ -182,5 +222,31 @@ class SourceDownloadCommand extends Command
         preg_match('/\/([^\/]*\.pdf)$/', $url, $match);
 
         return $match[1];
+    }
+
+    /**
+     * Return list of source links.
+     * This method is used to get array of source links. This source are used to get and parse from there links for PDF
+     * files.
+     *
+     * @return array
+     */
+    private function getSourceLinks(): array
+    {
+        $collection = [];
+        foreach ([self::SOURCE_COLLECTION_PATH, self::SOURCE_COLLECTION_PATH_1] as $path) {
+            $this->client->addRequest(url: $path, params: $this->requestParams);
+            $this->client->sendAll(true);
+            $crawler = new Crawler($this->client->getOneContent());
+
+            $response = $crawler->filter('.article_content .penci-link-post');
+            $response = array_map(function(Link $el) {
+                return $el->getUri();
+            }, $response->links());
+            $collection = array_merge($collection, $response);
+            $this->client->reset();
+        }
+
+        return $collection;
     }
 }

@@ -1,0 +1,59 @@
+{% extends "base.html.twig" %}
+
+{% block container %}
+    <div id="sources" class="card mt-3 rounded shadow-sm">
+        <div class="card-header">Info Numbers List ({{ pagination.getTotalItemCount }})</div>
+        <div class="card-body">
+            {{ knp_pagination_filter(pagination, {
+                'number.id': 'ID',
+                'number.number': 'Number',
+                'number.year': 'Year',
+                'number.code': 'Code',
+                'number.createdAt': 'Creeated on',
+                'number.updatedAt': 'Updated on',
+            }) }}
+            <table class="table">
+                <tr>
+                    <th>{{ knp_pagination_sortable(pagination, 'Id', 'number.id') }}</th>
+                    <th class="{{ pagination.isSorted('number.source') ? 'sorted' }}">
+                        {{ knp_pagination_sortable(pagination, 'Source', 'number.source') }}
+                    </th>
+                    <th class="{{ pagination.isSorted(['number.number', 'number.year']) ? 'sorted' }}">
+                        {{ knp_pagination_sortable(pagination, 'Formatted', ['number.number', 'number.year']) }}
+                    </th>
+                    <th class="{{ pagination.isSorted('number.number') ? 'sorted' }}">
+                        {{ knp_pagination_sortable(pagination, 'Number', 'number.number') }}
+                    </th>
+                    <th class="text-center {{ pagination.isSorted('number.year') ? 'sorted' }}">
+                        {{ knp_pagination_sortable(pagination, 'Year', 'number.year') }}
+                    </th>
+                    <th class="text-center {{ pagination.isSorted('number.code') ? 'sorted' }}">
+                        {{ knp_pagination_sortable(pagination, 'Code', 'number.code') }}
+                    </th>
+                    <th class="text-center {{ pagination.isSorted('number.createdAt') ? 'sorted' }}">
+                        {{ knp_pagination_sortable(pagination, 'Created on', 'number.createdAt') }}
+                    </th>
+                    <th class="text-center {{ pagination.isSorted('number.updatedAt') ? 'sorted' }}">
+                        {{ knp_pagination_sortable(pagination, 'Updated on', 'number.updatedAt') }}
+                    </th>
+                </tr>
+
+                {% for model in pagination %}
+                    <tr {% if loop.index is odd %}class="color"{% endif %}>
+                        <td>{{ model.id }}</td>
+                        <td>
+                            <a href="{{ path('admin_sources', {filterField: 'source.id', filterValue: model.source.id}) }}">{{ model.source.id }}</a>
+                        </td>
+                        <td>{{ model.formatted }}</td>
+                        <td>{{ model.number }}</td>
+                        <td class="text-center">{{ model.year }}</td>
+                        <td class="text-center"> {{ model.code }}</td>
+                        <td class="text-center">{{ model.createdAt|date("d/m/Y H:i") }}</td>
+                        <td class="text-center">{{ model.updatedAt|date("d/m/Y H:i") }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+            <div class="navigation"> {{ knp_pagination_render(pagination) }} </div>
+        </div>
+    </div>
+{% endblock %}

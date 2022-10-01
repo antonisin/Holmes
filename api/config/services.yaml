@@ -1,5 +1,6 @@
 parameters:
     VERIFICATION_LIMIT:  '%env(VERIFICATION_LIMIT)%'
+    PROXY:  '%env(PROXY)%'
 
 services:
     _defaults:

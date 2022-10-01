@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\UserNumber;
+use App\Lib\Helper;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -18,7 +19,7 @@ use Symfony\Component\Routing\Annotation\Route;
  *
  * @version 1.0.0
  */
-#[Route("/numbers/")]
+#[Route("/numbers/", name: "numbers_")]
 class UserNumberController extends AbstractFOSRestController
 {
     /**
@@ -30,7 +31,7 @@ class UserNumberController extends AbstractFOSRestController
      *
      * @return RedirectResponse - Redirect response on any of request.
      */
-    #[Route(methods: ['POST'])]
+    #[Route(name: 'create', methods: ['POST'])]
     public function post(Request $request, EntityManagerInterface $manager): RedirectResponse
     {
         $repo = $manager->getRepository(UserNumber::class);
@@ -41,23 +42,54 @@ class UserNumberController extends AbstractFOSRestController
         }
 
         $number = $request->request->get('number');
-        $number = preg_replace('/[^0-9\/]*/', '', $number);
+        $number = preg_replace('/[^0-9\/a-zA-Z]*/', '', $number);
         $number = explode('/', $number);
 
-        if (count($number) == 2 && null === $repo->findOneBy(['number' => $number[0], 'year' => $number[1]])) {
-            $model = new UserNumber();
-            $model
-                ->setUser($this->getUser())
-                ->setNumber($number[0])
-                ->setYear($number[1])
-            ;
-            $manager->persist($model);
-            $manager->flush();
-            $this->addFlash(
-                'success',
-                sprintf('Number %s/%s was successfully added', $model->getNumber(), $model->getYear())
-            );
+        if (count($number) < 2) {
+            $this->addFlash('error', 'Invalid personal number provided');
+
+            return $this->redirectToRoute('dashboard');
         }
+
+
+        $model = new UserNumber();
+        $model
+            ->setUser($this->getUser())
+            ->setNumber($number[0])
+        ;
+        if (count($number) === 2) {
+            $model->setYear($number[1]);
+        } else {
+            $model
+                ->setCode($number[1])
+                ->setYear($number[2])
+            ;
+        }
+
+        $exist = $repo->findOneBy([
+            'number' => $model->getNumber(),
+            'year'   => $model->getYear(),
+            'user'   => $this->getUser(),
+        ]);
+        if ($exist) {
+            $this->addFlash(
+                'error',
+                sprintf('Number %s/%s already exist', $model->getNumber(), $model->getYear())
+            );
+
+            return $this->redirectToRoute('dashboard');
+        }
+
+        if ($request->request->has('label')) {
+            $model->setLabel(Helper::normalizeString($request->request->get('label')));
+        }
+
+        $manager->persist($model);
+        $manager->flush();
+        $this->addFlash(
+            'success',
+            sprintf('Number %s/%s was successfully added', $model->getNumber(), $model->getYear())
+        );
 
         return $this->redirectToRoute('dashboard');
     }
@@ -71,7 +103,7 @@ class UserNumberController extends AbstractFOSRestController
      *
      * @return RedirectResponse - Redirect response on any type of requests.
      */
-    #[Route("/toggle/{id}")]
+    #[Route("/toggle/{id}", name: 'toggle')]
     public function toggle(UserNumber $number, EntityManagerInterface $manager): RedirectResponse
     {
         /** @noinspection PhpPossiblePolymorphicInvocationInspection */
@@ -88,6 +120,32 @@ class UserNumberController extends AbstractFOSRestController
             $number->getFormatted(),
             $number->isEnabled() ? 'Enabled' : 'Disabled'
         ));
+
+        return $this->redirectToRoute('dashboard');
+    }
+
+    /**
+     * Delete user number.
+     * This method is used to remove user number from database.
+     *
+     * @param UserNumber             $number  - Instance of user number from database.
+     * @param EntityManagerInterface $manager - Doctrine entity manager service instance.
+     *
+     * @return RedirectResponse - Redirect to main page.
+     */
+    #[Route('/delete/{id}', name: 'delete')]
+    public function delete(UserNumber $number, EntityManagerInterface $manager): RedirectResponse
+    {
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
+        if ($number->getUser()->getId() !== $this->getUser()?->getId()) {
+            $this->addFlash('error', 'Not allowed to update user number');
+
+            return $this->redirectToRoute('dashboard');
+        }
+        $this->addFlash('success', sprintf('Personal number %s was successful deleted', $number->getFormatted()));
+
+        $manager->remove($number);
+        $manager->flush();
 
         return $this->redirectToRoute('dashboard');
     }

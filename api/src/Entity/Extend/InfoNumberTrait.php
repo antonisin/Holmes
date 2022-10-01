@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @author Maxim Antonisin <maxim.antonisin@gmail.com>
  *
- * @version 1.0.0
+ * @version 1.1.0
  */
 trait InfoNumberTrait
 {
@@ -32,6 +32,15 @@ trait InfoNumberTrait
      */
     #[ORM\Column(type: 'integer')]
     private int $year;
+
+    /**
+     * Personal number code/type.
+     * This property contain special code value. This code value sometimes exists in required numbers.
+     *
+     * @var string|null
+     */
+    #[ORM\Column(type: 'string', nullable: true)]
+    private string|null $code;
 
 
     /**
@@ -91,6 +100,34 @@ trait InfoNumberTrait
     }
 
     /**
+     * Return personal number code/type.
+     * This method is used to return special code value. This code value sometimes exists in required numbers.
+     *
+     * @return string|null
+     */
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    /**
+     * Update personal number code/type.
+     * This method is used to update special code value. This code value sometimes exists in required numbers.
+     *
+     * @param string $code - Special personal number code/type. Sometimes presents in required numbers.
+     *
+     * @noinspection PhpDocSignatureInspection
+     *
+     * @return self
+     */
+    public function setCode(string $code): self
+    {
+        $this->code = strtoupper($code);
+
+        return $this;
+    }
+
+    /**
      * Return formatter string.
      * This method is used to return formatted string value, more familiar for user.
      *
@@ -98,6 +135,10 @@ trait InfoNumberTrait
      */
     public function getFormatted(): string
     {
-        return sprintf('%d/%d', $this->number, $this->year);
+        if (empty($this->code)) {
+            return sprintf('%d/%d', $this->number, $this->year);
+        }
+
+        return sprintf('%d/%s/%d', $this->number, $this->code, $this->year);
     }
 }

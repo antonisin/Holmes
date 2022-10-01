@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @author Maxim Antonisin <maxim.antonisin@gmail.com>
  *
- * @version 1.0.0
+ * @version 1.1.0
  */
 #[
     ORM\Entity(),
@@ -19,6 +19,32 @@ use Doctrine\ORM\Mapping as ORM;
 ]
 class Source extends BaseEntity
 {
+    /**
+     * State when everything is ok.
+     */
+    public const STATE_OK = 'STATE_OK';
+
+    /**
+     * State when source file cannot be accessed or url to file is invalid.
+     * For example: Link to 404 page.
+     */
+    public const STATE_BAD_SOURCE = 'STATE_BAD_SOURCE';
+
+    /**
+     * State when source file contain invalid or not PDF content.
+     */
+    public const STATE_INVALID_PDF = 'STATE_INVALID_PDF';
+
+    /**
+     * Collection of all possible states.
+     */
+    public const STATES = [
+        self::STATE_OK,
+        self::STATE_BAD_SOURCE,
+        self::STATE_INVALID_PDF,
+    ];
+
+
     /**
      * File name value.
      * This property contain file name from web interface on origin service. This value do not contain file extension
@@ -58,6 +84,16 @@ class Source extends BaseEntity
      */
     #[ORM\Column(type: 'datetime', nullable: true, options: ["default" => "CURRENT_TIMESTAMP"])]
     protected ?\DateTime $processedAt = null;
+
+    /**
+     * Shown source current state.
+     * This property shown state of the source file. State used to define if file source is ok or something wrong with
+     * it.
+     *
+     * @var string
+     */
+    #[ORM\Column(type: 'string', options: ["default" => self::STATE_OK])]
+    private string $state = self::STATE_OK;
 
 
     /**
@@ -166,6 +202,34 @@ class Source extends BaseEntity
     public function setProcessedAt(?\DateTime $processedAt): Source
     {
         $this->processedAt = $processedAt;
+
+        return $this;
+    }
+
+    /**
+     * Return current state.
+     * This method is used to get current file state. State used to define if file source is ok or something wrong with
+     * it.
+     *
+     * @return string
+     */
+    public function getState(): string
+    {
+        return $this->state;
+    }
+
+    /**
+     * Update current state.
+     * This method is used to update current file state. State used to define if file source is ok or something wrong
+     * with it.
+     *
+     * @param string $state - File state.
+     *
+     * @return $this
+     */
+    public function setState(string $state): self
+    {
+        $this->state = $state;
 
         return $this;
     }

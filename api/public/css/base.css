@@ -1,0 +1,32 @@
+.nav-link {
+    cursor: pointer;
+}
+
+ul.pagination {
+    justify-content: center!important;
+}
+
+.pagination {
+    margin-bottom: 0;
+}
+
+table a.sortable {
+    color: #000000 !important;
+}
+
+body {
+    background-color: #343a40;
+}
+.avatar {
+    vertical-align: middle;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+}
+.avatar-sm {
+    width: 40px;
+    height: 40px;
+}
+table.dataTable.no-footer {
+    border-bottom: 1px solid rgb(222, 226, 230);
+}

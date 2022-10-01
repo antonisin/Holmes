@@ -1,34 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Welcome!{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{{ asset('/vendor/components/font-awesome/css/all.css') }}"/>
-    <link rel="stylesheet" href="{{ asset('/vendor/components/font-awesome/css/brands.css') }}"/>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.11.5/datatables.min.css" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/brands.min.css" crossorigin="anonymous"/>
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/base.css') }}" />
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}?v=2" />
-
     {% block stylesheets %}
-        <style>
-            body {
-                background-color: #343a40;
-            }
-            .avatar {
-                vertical-align: middle;
-                width: 100px;
-                height: 100px;
-                border-radius: 50%;
-            }
-            .avatar-sm {
-                width: 40px;
-                height: 40px;
-            }
-            table.dataTable.no-footer {
-                border-bottom: 1px solid rgb(222, 226, 230);
-            }
-        </style>
     {% endblock %}
 </head>
 <body>
@@ -36,25 +17,7 @@
     {% set route = app.request.attributes.get('_route') %}
     <div class="container">
         {% if route != 'login' %}
-            <header class="p-3 bg-dark text-white">
-                <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                    <span class="fs-2 ms-3">Holmes</span>
-                        <ul class="nav col-12 col-sm-9 offset-sm-1 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                            <li>
-                                <a href="{{ path('dashboard') }}" class="nav-link px-2 {% if route == 'dashboard' %}text-warning{% else %}text-secondary{% endif %}">Dashboard</a>
-                            </li>
-                            <li>
-                                <a href="{{ path('app_user_settings') }}" class="nav-link px-2 {% if route == 'app_user_settings' %}text-warning{% else %}text-secondary{% endif %}">Settings</a>
-                            </li>
-                            <li>
-                                <a href="{{ path('admin') }}" class="nav-link px-2  {% if route == 'admin' %}text-warning{% else %}text-secondary{% endif %}">Admin</a>
-                            </li>
-                        </ul>
-                        <div class="text-end">
-                            <a type="button" class="btn btn-warning" href="/logout">Logout</a>
-                        </div>
-                </div>
-            </header>
+            {% include '/_navitation.html.twig' %}
         {% endif %}
         {% for message in app.flashes('success') %}
             <div class="alert mt-4 col-sm-12 alert-success">
@@ -74,8 +37,7 @@
     {% block javascripts %}
         <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-        <script src="{{ asset('/vendor/igorescobar/jquery-mask-plugin/dist/jquery.mask.min.js') }}"></script>
-        <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.11.5/datatables.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" crossorigin="anonymous"></script>
         <script src="{{ asset('/js/base.js') }}"></script>
 {% endblock %}
 {% endblock %}
