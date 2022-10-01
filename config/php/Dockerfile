@@ -7,7 +7,7 @@ RUN rm -rf /var/www/html
 
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN apk update && apk add icu-dev gnu-libiconv oniguruma-dev gettext-dev libxml2-dev libmcrypt libmcrypt-dev
+RUN apk update && apk add icu-dev gnu-libiconv oniguruma-dev gettext-dev libxml2-dev libmcrypt libmcrypt-dev git
 
 RUN ls /usr/local/etc/php
 #RUN sed -i -E 's#;opcache.max_accelerated_files.*#opcache.max_accelerated_files=20000#' /usr/local/etc/php/php.ini
