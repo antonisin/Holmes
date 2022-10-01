@@ -28,7 +28,7 @@ use \GuzzleHttp\Exception\ConnectException;
  *
  * @author Maxim Antonisin <maxim.antonisin@gmail.com>
  *
- * @version 1.1.0
+ * @version 1.2.0
  */
 class SourceDownloadCommand extends Command
 {
@@ -171,9 +171,9 @@ class SourceDownloadCommand extends Command
                 continue;
             }
 
-            $this->client->addRequest(Request::METHOD_GET, $model->getFileUrl(), [
+            $this->client->addRequest(Request::METHOD_GET, $model->getFileUrl(), array_merge($this->requestParams, [
                 RequestOptions::SINK => $destination,
-            ]);
+            ]));
 
             $this->manager->persist($model);
             $counter++;
