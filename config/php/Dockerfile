@@ -51,15 +51,8 @@ RUN cp /tmp/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 FROM php as php_prod
 
 RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
-COPY ./api /var/www/api
-RUN mkdir -p /var/www/api/var/log
-RUN mkdir -p /var/www/api/var/cache
-RUN chmod -R 777 /var/www/api/var/log
-RUN chmod -R 777 /var/www/api/var/cache
 
 RUN composer config --global gitlab-token.github.com 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
-#RUN composer install
-RUN composer update
 
 COPY config/php/entrypoint.sh /root/entrypoint.sh
 

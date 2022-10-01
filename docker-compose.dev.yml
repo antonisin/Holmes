@@ -35,8 +35,6 @@ services:
             context: ./
             dockerfile: config/php/Dockerfile
             target: php_dev
-        volumes:
-            - ./api:/var/www/api
 
     php_worker:
         <<: *php_container

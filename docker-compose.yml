@@ -6,7 +6,7 @@ services:
             context: config/nginx
         container_name: 'holmes_nginx'
         volumes:
-            - api-volume:/var/www/api
+            - ./api:/var/www/api
             - ./logs/nginx:/var/log/nginx
         expose: [ 80, 443 ]
         links: [ php ]
@@ -33,7 +33,7 @@ services:
         container_name: 'holmes_php'
         networks: [ default ]
         volumes:
-            - api-volume:/var/www/api
+            - ./api:/var/www/api
             - ./logs/app:/var/www/api/var/log
         links:
             - mysql
@@ -54,5 +54,4 @@ networks:
         name: holmes_network
 
 volumes:
-    api-volume:
     mysql-volume:
