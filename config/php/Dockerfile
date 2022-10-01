@@ -32,6 +32,7 @@ RUN sed -i -E 's#max_execution_time.*#max_execution_time=600#' /usr/local/etc/ph
 RUN apk add supervisor
 COPY config/php/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY config/php/supervisord.conf /etc/supervisord.conf
+COPY config/php/crontab /etc/crontabs/root
 
 CMD /usr/bin/supervisord -c /etc/supervisord.conf
 
