@@ -57,7 +57,7 @@ RUN chmod -R 777 /var/www/api/var/log
 RUN chmod -R 777 /var/www/api/var/cache
 
 RUN composer config --global gitlab-token.github.com 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
-RUN composer install
+#RUN composer install
 RUN composer update
 
 COPY config/php/entrypoint.sh /root/entrypoint.sh
