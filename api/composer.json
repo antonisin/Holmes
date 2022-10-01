@@ -24,7 +24,7 @@
         "knpuniversity/oauth2-client-bundle": "^2.8",
         "league/oauth2-facebook": "^2.2",
         "league/oauth2-google": "^4.0",
-        "maximantonisin/spirit-client": "v1.3.0-beta",
+        "maximantonisin/spirit-client": "v1.3.1-beta",
         "nelmio/api-doc-bundle": "^4.6",
         "phpdocumentor/reflection-docblock": "^5.2",
         "scienta/doctrine-json-functions": "^4.4",
