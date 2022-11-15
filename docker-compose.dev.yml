@@ -6,8 +6,8 @@ services:
             - ./api:/var/www/api
         labels:
             - traefik.enable=true
-            - traefik.http.routers.holmes-app.rule=HostRegexp(`holmes.dev`,`{subdomain:.+}.holmes.dev`)
-            - traefik.http.routers.holmes-app-ssl.rule=HostRegexp(`holmes.dev`,`{subdomain:.+}.holmes.dev`)
+            - traefik.http.routers.holmes-app.rule=HostRegexp(`holmes.test`,`{subdomain:.+}.holmes.test`)
+            - traefik.http.routers.holmes-app-ssl.rule=HostRegexp(`holmes.test`,`{subdomain:.+}.holmes.test`)
             - traefik.http.routers.holmes-app-ssl.entrypoints=webs,web
             - traefik.http.routers.holmes-app-ssl.tls=true
             - traefik.http.services.holmes-app-ssl.loadbalancer.server.port=443
@@ -38,6 +38,10 @@ services:
 
     php_worker:
         <<: *php_container
+        build:
+            context: ./
+            dockerfile: config/php/Dockerfile
+            target: php_worker
 
 networks:
     default:

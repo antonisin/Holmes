@@ -15,6 +15,9 @@ RUN ls /usr/local/etc/php
 #RUN sed -i -E 's#;realpath_cache_ttl.*#realpath_cache_ttl=600#' /usr/local/etc/php/php.ini
 
 RUN docker-php-ext-install mysqli pdo pdo_mysql intl mbstring
+RUN apk --update add --no-cache --virtual .php-ext-install-deps $PHPIZE_DEPS libxslt-dev libgcrypt-dev
+RUN apk add --update --no-cache g++ gcc
+RUN docker-php-ext-install -j$(nproc) xsl
 RUN apk add --no-cache  gnu-libiconv
 
 WORKDIR /var/www/api

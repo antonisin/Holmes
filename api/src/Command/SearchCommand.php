@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Maxim Antonisin <maxim.antonisin@gmail.com>
  *
- * @version 1.1.0
+ * @version 1.2.0
  */
 class SearchCommand extends Command
 {
@@ -60,7 +60,7 @@ class SearchCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('app:watch:search')
+            ->setName('app:number:search')
             ->setDescription('Command to search subscribed/watched user numbers.')
             ->setAliases(['a:w:s'])
             ->addOption(
@@ -85,8 +85,8 @@ class SearchCommand extends Command
         $limit = (int) ($input->getOption('limit') ?? 1);
 
         $collection = $this->manager->getRepository(UserNumber::class)->findBy([
-                'enabled'    => true,
-                'infoNumber' => null,
+            'enabled'    => true,
+            'infoNumber' => null,
         ], ['searchAt' => 'ASC'], $limit);
 
         $repo = $this->manager->getRepository(InfoNumber::class);
@@ -110,13 +110,16 @@ class SearchCommand extends Command
             ]);
             if ($exist) {
                 $output->writeln('Found');
-
                 $model->setInfoNumber($exist);
 
-                $this->notificationService
-                    ->setNotification($model->getUser()->getNotification())
-                    ->sendNotification($model)
-                ;
+                try {
+                    $this->notificationService->sendFound($model);
+                } /** @noinspection PhpFullyQualifiedNameUsageInspection */ catch (
+                    \Symfony\Component\Mailer\Exception\TransportExceptionInterface |
+                    \Symfony\Component\Notifier\Exception\TransportExceptionInterface $exception
+                ) {
+                    $output->writeln(sprintf('Error: %s', $exception->getMessage()));
+                }
             } else {
                 $output->writeln('Not Found');
             }

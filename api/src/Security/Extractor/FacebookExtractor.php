@@ -13,7 +13,7 @@ use League\OAuth2\Client\Provider\ResourceOwnerInterface;
  *
  * @author Maxim Antonisin <maxim.antonisin@gmail.com>
  *
- * @version 1.0.0
+ * @version 1.1.0
  */
 abstract class FacebookExtractor implements ExtractorInterface
 {
@@ -27,13 +27,17 @@ abstract class FacebookExtractor implements ExtractorInterface
         $model = new User();
 
         $model
-            ->setEmail($authUser->getEmail())
             ->setFirstName($authUser->getFirstName())
             ->setLastName($authUser->getLastName())
             ->setRefId($authUser->getId())
             ->setPicture($authUser->getPictureUrl())
             ->addRole(User::ROLE_FACEBOOK)
+
+            ->getNotification()
+            ->setEmail($authUser->getEmail())
+            ->setEmailVerified(true)
         ;
+
 
         return $model;
     }

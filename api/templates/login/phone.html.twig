@@ -1,0 +1,27 @@
+{% extends "/login/base.html.twig" %}
+
+{% block container %}
+    <div class="card-header">
+        <a href="{{ path('login') }}" class="btn btn-sm btn-outline-secondary">Back</a>
+    </div>
+
+    {% for message in app.flashes('error') %}
+        <div class="alert mt-4 col-sm-12 alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+
+    <div class="card-body">
+        <h4>Login with phone</h4>
+        <form action="{{ path('login_phone_verify') }}" method="POST">
+            <div class="form-group mb-2">
+                <label for="phone">Phone Number</label>
+                <input type="text" name="phone" class="form-control" id="phone" placeholder="Phone">
+            </div>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-lg btn-warning">Login</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

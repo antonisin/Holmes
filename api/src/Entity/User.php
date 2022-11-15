@@ -1,7 +1,8 @@
-<?php
+<?php /** @noinspection PhpUnused */
 
 namespace App\Entity;
 
+use App\Repository\UserRepository;
 use App\ThrowException\ModelException;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
@@ -14,10 +15,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * @author Maxim Antonisin <maxim.antonisin@gmail.com>
  *
- * @version 1.0.0
+ * @version 1.1.0
  */
 #[
-    ORM\Entity,
+    ORM\Entity(repositoryClass: UserRepository::class),
     ORM\HasLifecycleCallbacks
 ]
 class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUserInterface
@@ -28,6 +29,9 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
     public const ROLE_FACEBOOK = 'ROLE_FACEBOOK';
     public const ROLE_VK       = 'ROLE_VK';
     public const ROLE_OK       = 'ROLE_OK';
+    public const ROLE_EMAIL    = 'ROLE_EMAIL';
+    public const ROLE_PHONE    = 'ROLE_PHONE';
+    public const ROLE_TEMP_USER = 'ROLE_TEMP_USER';
 
     public const ROLES = [
         self::ROLE_ADMIN,
@@ -36,18 +40,11 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
         self::ROLE_FACEBOOK,
         self::ROLE_VK,
         self::ROLE_OK,
+        self::ROLE_EMAIL,
+        self::ROLE_PHONE,
+        self::ROLE_TEMP_USER,
     ];
 
-
-    /**
-     * User's email.
-     * This property contain user's email. In some cases, authentication social service do not return email values for
-     * security and privacy reasons, in this cases email will be empty.
-     *
-     * @var string|null
-     */
-    #[ORM\Column(type: 'string', nullable: true)]
-    private string|null $email = null;
 
     /**
      * User's first name.
@@ -111,32 +108,6 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
             $this->notification = new UserNotification();
             $this->notification->setUser($this);
         }
-    }
-
-    /**
-     * Return user's email.
-     * This method is used to return user's email. In some cases, authentication social service do not return email
-     * values for security and privacy reasons, in this cases email will be empty.
-     *
-     * @return string|null
-     */
-    public function getEmail(): string|null
-    {
-        return $this->email;
-    }
-
-    /**
-     * Update user's email.
-     * This method is used to update user's email. In some cases, authentication social service do not return email
-     * values for security and privacy reasons, in this cases email will be empty.
-     *
-     * @param string $email - User email address.
-     */
-    public function setEmail(string $email): self
-    {
-        $this->email = $email;
-
-        return $this;
     }
 
     /**
@@ -250,17 +221,41 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
      * Add new user's role.
      * This method is used to add new user's role.
      *
-     * @param string $role - Role value to be added
+     * @param array<string> $roles - Role value to be added
      *
      * @return self
      *
      * @throws ModelException - Model exception on invalid role.
      */
-    public function addRole(string $role): self
+    public function addRole(...$roles): self
+    {
+        array_map(function ($role) {
+            self::validateRole($role);
+        }, $roles);
+
+        $this->roles = array_merge($this->roles, $roles);
+
+        return $this;
+    }
+
+    /**
+     * Remove user's role.
+     * This method is used to remove user's role.
+     *
+     * @param string $role - Role value to be removed.
+     *
+     * @return self
+     *
+     * @throws ModelException - Model exception on invalid role.
+     */
+    public function removeRole(string $role): self
     {
         self::validateRole($role);
 
-        $this->roles[] = $role;
+        $this->roles = array_filter($this->roles, function ($item) use ($role) {
+            return $item !== $role;
+        });
+        $this->roles = array_values($this->roles);
 
         return $this;
     }

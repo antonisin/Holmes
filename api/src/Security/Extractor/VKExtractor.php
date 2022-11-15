@@ -4,7 +4,7 @@ namespace App\Security\Extractor;
 
 use App\Entity\User;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
-use \J4k\OAuth2\Client\Provider\User as BaseProviderUser;
+use J4k\OAuth2\Client\Provider\User as BaseProviderUser;
 
 /**
  * Vkontakte extractor.
@@ -13,7 +13,7 @@ use \J4k\OAuth2\Client\Provider\User as BaseProviderUser;
  *
  * @author Maxim Antonisin <maxim.antonisin@gmail.com>
  *
- * @version 1.0.0
+ * @version 1.1.0
  */
 abstract class VKExtractor implements ExtractorInterface
 {
@@ -27,12 +27,15 @@ abstract class VKExtractor implements ExtractorInterface
         $model = new User();
 
         $model
-            ->setEmail($authUser->getEmail())
             ->setFirstName($authUser->getFirstName())
             ->setLastName($authUser->getLastName())
             ->setRefId($authUser->getId())
             ->setPicture($authUser->getPhotoMax())
             ->addRole(User::ROLE_VK)
+
+            ->getNotification()
+            ->setEmail($authUser->getEmail())
+            ->setEmailVerified(true)
         ;
 
         return $model;

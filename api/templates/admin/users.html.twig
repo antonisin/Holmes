@@ -19,9 +19,6 @@
                         {{ knp_pagination_sortable(pagination, 'Full Name', ['user.firstName', 'user.lastName']) }}
                     </th>
                     <th class="text-center">Photo</th>
-                    <th class="text-center {{ pagination.isSorted('user.email') ? 'sorted' }}">
-                        {{ knp_pagination_sortable(pagination, 'Email', 'user.email') }}
-                    </th>
                     <th class="text-center {{ pagination.isSorted('user.refId') ? 'sorted' }}">
                         {{ knp_pagination_sortable(pagination, 'Ref ID', 'user.refId') }}
                     </th>
@@ -34,6 +31,7 @@
                     <th class="text-center {{ pagination.isSorted('user.updatedAt') ? 'sorted' }}">
                         {{ knp_pagination_sortable(pagination, 'Updated on', 'user.updatedAt') }}
                     </th>
+                    <th>Actions</th>
                 </tr>
 
                 {% for model in pagination %}
@@ -42,11 +40,11 @@
                         <td>{{ model.firstName }} {{ model.lastName }}</td>
                         <td class="text-center"><!--suppress HtmlDeprecatedAttribute -->
                             <img src="{{ model.picture }}" alt="Avatar" class="avatar avatar-sm" onerror="this.onerror=null;this.src='https://placeimg.com/200/300/animals';"/></td>
-                        <td>{{ model.email }}</td>
                         <td>{{ model.refId }}</td>
                         <td>{{ model.roles|join(', ') }}</td>
                         <td class="text-center">{{ model.createdAt|date("d/m/Y H:i") }}</td>
                         <td class="text-center">{{ model.updatedAt|date("d/m/Y H:i") }}</td>
+                        <td class="text-center"><a href="{{ path("app_user_settings", {'_switch_user': model.id}) }}" class="btn btn-sm btn-outline-warning">Login</a></td>
                     </tr>
                 {% endfor %}
             </table>

@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @author Maxim Antonisin <maxim.antonisin@gmail.com>
  *
- * @version 1.0.0
+ * @version 1.1.0
  */
 #[
     ORM\Entity,
@@ -23,6 +23,8 @@ class Verification extends BaseEntity
 {
     public const PHONE_TYPE = 'PHONE_TYPE';
     public const EMAIL_TYPE = 'EMAIL_TYPE';
+
+    public const MAX_ATTEMPTS = 3;
 
     public const TYPES = [
         self::PHONE_TYPE,
@@ -54,7 +56,7 @@ class Verification extends BaseEntity
      * @var string
      */
     #[ORM\Column(type: 'string', nullable: false, options: ["default" => Verification::PHONE_TYPE])]
-    private string $type;
+    private string $type = self::PHONE_TYPE;
 
     /**
      * Related user notification entity instance.
@@ -64,7 +66,7 @@ class Verification extends BaseEntity
      */
     #[
         ORM\OneToOne(inversedBy: 'verification', targetEntity: UserNotification::class),
-        ORM\JoinColumn(name: 'notification_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE'),
+        ORM\JoinColumn(name: 'notification_id', referencedColumnName: 'id', nullable: true, onDelete: 'CASCADE'),
     ]
     private UserNotification $notification;
 

@@ -1,9 +1,12 @@
-<?php
+<?php /** @noinspection PhpFullyQualifiedNameUsageInspection */
 
 namespace App\Controller;
 
+use App\Entity\UserNotification;
 use App\Entity\Verification;
+use App\Lib\Helper;
 use App\Service\UserNotificationService;
+use App\ThrowException\ModelException;
 use App\ThrowException\ServiceException;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -18,7 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
  *
  * @author Maxim Antonisin <maxim.antonisin@gmail.com>
  *
- * @version 1.0.0
+ * @version 1.1.0
  */
 #[Route('/notifications/')]
 class UserNotificationController extends AbstractFOSRestController
@@ -41,21 +44,23 @@ class UserNotificationController extends AbstractFOSRestController
     {
         /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $model = $this->getUser()->getNotification();
-        $code  = $request->get('verificationCode', false);
+        $code  = Helper::normalizeString($request->get('verificationCode', false));
 
         if ($code) {
-            $service
-                ->setNotification($model)
-                ->verify($code)
-            ;
+            $service->verify($code);
 
             return $this->redirectToRoute('app_user_settings');
+        } elseif ($request->request->has('verificationCode')) {
+            $this->addFlash('error', 'Invalid verification code');
         }
-        $phone = $request->get('phone');
-        $phone = (int) preg_replace('/[^\d]+/', '', $phone);
+
+        $phone = Helper::normalizePhone($request->get('phone'));
+        /** @var UserNotification $model */
         $model
             ->setPhone($phone === 0 ? null : $phone)
+            ->setPhoneEnabled($request->get('phoneEnabled', false))
             ->setEmail($request->get('email', ''))
+            ->setEmailEnabled($request->get('emailEnabled', false))
         ;
 
         $manager->persist($model);
@@ -72,6 +77,9 @@ class UserNotificationController extends AbstractFOSRestController
      * @param string                  $_route  - Route name used for request. Value needed to identify type of verify.
      *
      * @return RedirectResponse - Redirect response on any types of requests.
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface - If email sending failed.
+     * @throws \Symfony\Component\Notifier\Exception\TransportExceptionInterface - If sms sending failed.
+     * @throws ModelException - Exception on model validation error (for ex. invalid type).
      */
     #[
         Route("verify/email", name: 'app_user_notification_verify_email', methods: [ Request::METHOD_GET ]),
@@ -81,12 +89,7 @@ class UserNotificationController extends AbstractFOSRestController
     {
         $type = $_route === 'app_user_notification_verify_email' ? Verification::EMAIL_TYPE : Verification::PHONE_TYPE;
         try {
-            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
-            $service
-                ->setNotification($this->getUser()->getNotification())
-                ->generateVerification($type)
-                ->sendVerification()
-            ;
+            $service->sendVerification($type);
         } catch (ServiceException $exception) {
             $this->addFlash('error', $exception->getMessage());
         }

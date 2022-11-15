@@ -1,0 +1,36 @@
+{% extends "/login/base.html.twig" %}
+
+{% block container %}
+    <div class="card-header">Login/Registry into your personal account</div>
+
+    {% for message in app.flashes('error') %}
+        <div class="alert mt-4 col-sm-12 alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <div class="card-body">
+        <p>Holmes project is using google auth social network auth system. To do that, click login button login via google account.</p>
+        <div class="d-grid gap-2">
+            <a href="{{ path('connect_google') }}" class="btn btn-outline-success btn-lg">
+                <i class="fa-brands fa-google"></i> Login with Google
+            </a>
+            <a href="{{ path('connect_facebook') }}" class="btn btn-outline-primary btn-lg disabled">
+                <i class="fa-brands fa-facebook"></i> Login with Facebook (disabled)
+            </a>
+            <a href="{{ path('connect_vkontakte') }}" class="btn btn-outline-primary btn-lg">
+                <i class="fa-brands fa-vk"></i> Login with VK
+            </a>
+            <a href="{{ path('connect_odnoklassniki') }}" class="btn btn-outline-warning btn-lg">
+                <i class="fa-brands fa-odnoklassniki"></i> Login with OK
+            </a>
+            <a href="{{ path('login_phone') }}" class="btn btn-outline-secondary btn-lg">
+                <i class="bi bi-phone"></i> Login with phone
+            </a>
+            <a href="{{ path('login_email') }}" class="btn btn-outline-secondary btn-lg">
+                <i class="bi bi-envelope"></i> Login with email
+            </a>
+        </div>
+    </div>
+
+{% endblock %}

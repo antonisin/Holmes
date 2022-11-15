@@ -1,0 +1,27 @@
+{% extends "/login/base.html.twig" %}
+
+{% block container %}
+    <div class="card-header">
+        <a href="{{ path('login') }}" class="btn btn-sm btn-outline-secondary">Back</a>
+    </div>
+
+    {% for message in app.flashes('error') %}
+        <div class="alert mt-4 col-sm-12 alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+
+    <div class="card-body">
+        <h4>Login with email</h4>
+        <form action="{{ path('login_email_verify') }}" method="POST">
+            <div class="form-group mb-2">
+                <label for="email">Email Address</label>
+                <input type="text" name="email" class="form-control" id="email" placeholder="Email">
+            </div>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-lg btn-warning">Login</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

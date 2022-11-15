@@ -28,9 +28,9 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
  *
  * @author Maxim Antonisin <maxim.antonisin@gmail.com>
  *
- * @version 1.0.0
+ * @version 1.2.0
  */
-class Authenticator extends OAuth2Authenticator
+class SocialAuthenticator extends OAuth2Authenticator
 {
     /**
      * Client Registry.
@@ -110,12 +110,6 @@ class Authenticator extends OAuth2Authenticator
                     default         => throw new AppException(sprintf('Unknown social network and extractor %d', $type)),
                 };
 
-                if ($user->getEmail()) {
-                    $user->getNotification()
-                        ->setEmail($user->getEmail())
-                        ->setEmailVerified(true)
-                    ;
-                }
                 $this->manager->persist($user);
                 $this->manager->flush();
 

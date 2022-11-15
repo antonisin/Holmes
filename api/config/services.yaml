@@ -1,6 +1,8 @@
 parameters:
     VERIFICATION_LIMIT:  '%env(VERIFICATION_LIMIT)%'
     PROXY:  '%env(PROXY)%'
+    MAILER_FROM: '%env(MAILER_FROM)%'
+    MAILER_FROM_NAME: '%env(MAILER_FROM_NAME)%'
 
 services:
     _defaults:
@@ -24,7 +26,3 @@ services:
         arguments: ['@router', '@request_stack']
         tags:
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
-#    security.logout_listener:
-#        arguments: ['@security.token_storage', '@security.http_utils', '@event_dispatcher', []]
-#        class: App\EventListener\LogoutListener
-#        abstract: true

@@ -1,0 +1,12 @@
+framework:
+    notifier:
+        texter_transports:
+            # Do not send sms notification on dev env.
+            gatewayapi: 'null://null'
+        channel_policy:
+            urgent: ['sms']
+            high: ['sms']
+            medium: ['sms']
+            low: ['sms']
+        admin_recipients:
+            - { email: dev.maxim.antonisin@gmail.com }

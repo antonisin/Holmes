@@ -1,1 +1,12 @@
-<p>Login form <a href="{{ path('login') }}">Login form</a></p>
+{% extends "base.html.twig" %}
+
+{% block body %}
+    <div class="container py-5">
+
+        <div class="card my-5 py-5 rounded shadow-sm">
+            <div class="card-body text-center">
+                <h4>Login form <a class="btn btn-lg btn-warning" href="{{ path('login') }}">Login</a></h4>
+            </div>
+        </div>
+    </div>
+{% endblock %}

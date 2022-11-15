@@ -7,19 +7,37 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * User notification doctrine entity model.
- * This class is implemented as document entity model to work with user notification settings. This settings are used
+ * This class is implemented as document entity model to work with user notification settings. These settings are used
  * for notification via email and phone.
  *
  * @author Maxim Antonisin <maxim.antonisin@gmail.com>
  *
- * @version 1.0.0
+ * @version 1.1.0
  */
 #[
-    ORM\Entity(),
+    ORM\Entity,
     ORM\HasLifecycleCallbacks
 ]
 class UserNotification extends BaseEntity
 {
+    /**
+     * Phone verified or not.
+     * This property show if phone was verified or not.
+     *
+     * @var bool
+     */
+    #[ORM\Column(type: 'boolean')]
+    private bool $phoneVerified = false;
+
+    /**
+     * Email verified or not.
+     * This property shown if email was verified or not.
+     *
+     * @var bool
+     */
+    #[ORM\Column(type: 'boolean')]
+    private bool $emailVerified = false;
+
     /**
      * User's phone for notification.
      *
@@ -37,20 +55,22 @@ class UserNotification extends BaseEntity
     private string|null $email = null;
 
     /**
-     * Phone verified or not.
+     * Enabled or not phone notification.
+     * This setting is used to enable or disable phone notification.
      *
      * @var bool
      */
-    #[ORM\Column(type: 'boolean')]
-    private bool $phoneVerified = false;
+    #[ORM\Column(type: 'boolean', nullable: false, options: ["default" => false])]
+    private bool $phoneEnabled = false;
 
     /**
-     * Email verified or not.
+     * Enabled or not email notification.
+     * This setting is used to enable or disable email notification.
      *
      * @var bool
      */
-    #[ORM\Column(type: 'boolean')]
-    private bool $emailVerified = false;
+    #[ORM\Column(type: 'boolean', nullable: false, options: ["default" => false])]
+    private bool $emailEnabled = false;
 
     /**
      * Related user entity model.
@@ -100,54 +120,6 @@ class UserNotification extends BaseEntity
     public function getUser(): User
     {
         return $this->user;
-    }
-
-    /**
-     * Return phone number for notification.
-     *
-     * @return int|null
-     */
-    public function getPhone(): ?int
-    {
-        return $this->phone;
-    }
-
-    /**
-     * Update phone number for verification.
-     *
-     * @param int|null $phone - User's phone number used for notification messages.
-     *
-     * @return UserNotification
-     */
-    public function setPhone(?int $phone): UserNotification
-    {
-        $this->phone = $phone;
-
-        return $this;
-    }
-
-    /**
-     * Return email for notifications.
-     *
-     * @return string|null
-     */
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    /**
-     * Update email for notification.
-     *
-     * @param string|null $email - User's email used for notification messages.
-     *
-     * @return UserNotification
-     */
-    public function setEmail(?string $email): UserNotification
-    {
-        $this->email = $email;
-
-        return $this;
     }
 
     /**
@@ -229,6 +201,106 @@ class UserNotification extends BaseEntity
     }
 
     /**
+     * Return phone number for notification.
+     *
+     * @return int|null
+     */
+    public function getPhone(): ?int
+    {
+        return $this->phone;
+    }
+
+    /**
+     * Update phone number for verification.
+     *
+     * @param int|null $phone - User's phone number used for notification messages.
+     *
+     * @return $this
+     */
+    public function setPhone(?int $phone): self
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    /**
+     * Return email for notifications.
+     *
+     * @return string|null
+     */
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    /**
+     * Update email for notification.
+     *
+     * @param string|null $email - User's email used for notification messages.
+     *
+     * @return $this
+     */
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * Check if phone notification is enabled.
+     * This method is used to check if phone notification is enabled.
+     *
+     * @return bool
+     */
+    public function isPhoneEnabled(): bool
+    {
+        return $this->phoneEnabled;
+    }
+
+    /**
+     * Update phone notification state.
+     * This method is used to update phone notification state to send or not notification messages.
+     *
+     * @param bool $phoneEnabled - State of phone notification.
+     *
+     * @return $this
+     */
+    public function setPhoneEnabled(bool $phoneEnabled): self
+    {
+        $this->phoneEnabled = $phoneEnabled;
+
+        return $this;
+    }
+
+    /**
+     * Check if email notification is enabled.
+     * This method is used to check if email notification is enabled.
+     *
+     * @return bool
+     */
+    public function isEmailEnabled(): bool
+    {
+        return $this->emailEnabled;
+    }
+
+    /**
+     * Update email notification state.
+     * This method is used to update email notification state to send or not notification messages.
+     *
+     * @param bool $emailEnabled - State of email notification.
+     *
+     * @return $this
+     */
+    public function setEmailEnabled(bool $emailEnabled): self
+    {
+        $this->emailEnabled = $emailEnabled;
+
+        return $this;
+    }
+
+    /**
      * Method called on every record update process.
      *
      * @param PreUpdateEventArgs $opt - Options contain old and new entity properties values.
@@ -236,7 +308,7 @@ class UserNotification extends BaseEntity
      * @return void
      */
     #[ORM\PreUpdate]
-    public function preUpdate(PreUpdateEventArgs $opt)
+    public function preUpdate(PreUpdateEventArgs $opt): void
     {
         parent::preUpdate($opt);
 
